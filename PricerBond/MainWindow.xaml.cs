@@ -72,8 +72,8 @@ namespace PricerBond
         private void QuickSimulation(object sender, RoutedEventArgs e)
         {
             double faceValue = 100000;
-            double annualRate = 5.5;
-            double marketRate = 1.2;
+            double annualRate = 5.5/100;
+            double marketRate = 1.2/100;
             ConventionDate maturity = new ConventionDate(2025, 10, 12);
             int frequency = 1;
             bond = new Bond(faceValue, annualRate, marketRate, frequency, maturity);

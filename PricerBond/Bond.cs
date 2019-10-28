@@ -30,9 +30,9 @@ namespace PricerBond
             int nbDays = firstCoupon.NumberDays(today);
             double factor = (double)nbDays / (double)today.GetDaysPerYear();
             price += factor * faceValue * annualRate / Math.Pow((1 + marketRate), factor);
-            for (int year = 1; year < YearsTillMaturity(); year++)
+            for (int year = 1; year < frequency * YearsTillMaturity(); year++)
             {
-                price += faceValue * annualRate / Math.Pow((1 + marketRate), factor + year);
+                price += faceValue * annualRate / Math.Pow((1 + marketRate), factor + (year / frequency)) / (double)frequency;
             }
             price += faceValue * (1 + annualRate) / Math.Pow((1 + marketRate), factor + YearsTillMaturity());
             return Math.Round(price, 2);

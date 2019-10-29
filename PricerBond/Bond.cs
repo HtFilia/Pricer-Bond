@@ -87,7 +87,7 @@ namespace PricerBond
                 }
                 idx++;
             }
-            return goodIdx;
+            return months[goodIdx];
         }
 
         private int FindClosestAfter(List<int> months, int month)
@@ -105,7 +105,7 @@ namespace PricerBond
                 }
                 idx++;
             }
-            return (goodIdx + 1 < months.Count ? goodIdx + 1 : 0);
+            return months[goodIdx + 1 < months.Count ? goodIdx + 1 : 0];
         }
 
         private static int mod(int x, int m)

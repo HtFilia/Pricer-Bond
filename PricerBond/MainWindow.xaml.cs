@@ -25,6 +25,7 @@ namespace PricerBond
     public partial class MainWindow : Window
     {
         Bond bond;
+        Action action;
 
         public MainWindow()
         {
@@ -33,6 +34,8 @@ namespace PricerBond
         
         private void SetParameters(object sender, RoutedEventArgs e)
         {
+            // Get Action if needed
+
             // Create Bond from User's Input
             int frequency;
             if ((bool)monthly.IsChecked)

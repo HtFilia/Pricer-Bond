@@ -1,9 +1,12 @@
-﻿using System;
+﻿using IronPython.Hosting;
+using Microsoft.Scripting.Hosting;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -83,5 +86,21 @@ namespace PricerBond
             ShowPrice(bond.GetPrice());
         }
 
+        private string GetActionTrajectory()
+        {
+            var engine = Python.CreateEngine();
+            ScriptSource source = engine.CreateScriptSourceFromFile("market.py");
+            return source.Execute();
+        }
+
+        private void BuildAction()
+        {
+            action = new Action();
+            string json = GetActionTrajectory();
+            var ms = new MemoryStream(Encoding.UTF8.GetBytes(json));
+            var ser = new DataContractJsonSerializer(action.GetType());
+            action = ser.ReadObject(ms) as Action;
+            ms.Close();
+        }
     }
 }

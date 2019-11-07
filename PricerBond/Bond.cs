@@ -22,23 +22,69 @@ namespace PricerBond
             this.maturity = maturity;
         }
 
-        public double GetPrice()
+        public double GetPrice(Action action)
         {
+            double perf;
+            double perfFactor = 1;
             double price = 0;
-            ConventionDate today = new ConventionDate();
-            ConventionDate firstCoupon = GetFirstCouponDate(today, frequency);
-            int nbDays = firstCoupon.NumberDays(today);
-            double factor = (double)nbDays / (double)today.GetDaysPerYear();
+            int year = 1;
+            ConventionDate previousDate = new ConventionDate();
+            ConventionDate currentDate = GetNextCouponDate(previousDate);
+            int nbDays = previousDate.NumberDays(currentDate);
+            double factor = (double)nbDays / (double)previousDate.GetDaysPerYear();
             price += factor * faceValue * annualRate / Math.Pow((1 + marketRate), factor);
-            for (int year = 1; year < frequency * YearsTillMaturity(); year++)
+            while (!currentDate.Equals(maturity))
             {
-                price += faceValue * annualRate / Math.Pow((1 + marketRate), factor + (year / frequency)) / (double)frequency;
+                
+                if (action != null)
+                {
+                    perf = action.GetPerf(currentDate, previousDate);
+                    if (perf > 0.2)
+                    {
+                        perfFactor = 1;
+                    } else if (perf > 0.1)
+                    {
+                        perfFactor = 0.7;
+                    } else
+                    {
+                        perfFactor = 0.5;
+                    }
+                }
+                price += perfFactor * faceValue * annualRate / Math.Pow(1 + marketRate, factor + (year / frequency)) / (double)frequency;
+                year += 1;
+                previousDate = currentDate;
+                currentDate = GetNextCouponDate(currentDate);
             }
-            price += faceValue * (1 + annualRate) / Math.Pow((1 + marketRate), factor + YearsTillMaturity());
-            return Math.Round(price, 2);
+            /*for (int year = 1; year < frequency * YearsTillMaturity(); year++)
+            {
+                if (action != null)
+                {
+                    perf = action.GetPerf(year);
+                }
+                price += perf * faceValue * annualRate / Math.Pow((1 + marketRate), factor + (year / frequency)) / (double)frequency;
+            }*/
+            if (action != null)
+            {
+                perf = action.GetPerf(previousDate, maturity);
+                if (perf > 0.2)
+                {
+                    perfFactor = 1;
+                }
+                else if (perf > 0.1)
+                {
+                    perfFactor = 0.7;
+                }
+                else
+                {
+                    perfFactor = 0.5;
+                }
+            }
+            price += perfFactor * faceValue * (1 + annualRate) / Math.Pow((1 + marketRate), factor + YearsTillMaturity());
+            return price;
+            
         }
 
-        private ConventionDate GetFirstCouponDate(ConventionDate today, int frequency)
+        private ConventionDate GetNextCouponDate(ConventionDate today)
         {
             int nextDay = maturity.Day;
             int nextMonth = GetNextMonth(today);
@@ -115,7 +161,7 @@ namespace PricerBond
 
         private int GetNextYear(ConventionDate today, int nextMonth)
         {
-            if (nextMonth < today.Month || frequency == 12)
+            if (nextMonth < today.Month)
             {
                 return today.Year + 1;
             }

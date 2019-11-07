@@ -37,8 +37,6 @@ namespace PricerBond
         
         private void SetParameters(object sender, RoutedEventArgs e)
         {
-            // Get Action if needed
-
             // Create Bond from User's Input
             int frequency;
             if ((bool)monthly.IsChecked)
@@ -61,18 +59,25 @@ namespace PricerBond
             double annualRate = Double.Parse(AnnualRate.Text, CultureInfo.InvariantCulture) / 100;
             double faceValue = Double.Parse(FaceValue.Text, CultureInfo.InvariantCulture);
             ConventionDate maturity = new ConventionDate(Maturity.Text);
+
+            // Get Action if needed
+            string yieldType = FormatString(YieldType.SelectedItem.ToString());
+            if (yieldType == "Variable Yield")
+            {
+                action = new Action("ACCOR", 100, new ConventionDate(), maturity);
+            }
             bond = new Bond(faceValue, annualRate, marketRate, frequency, maturity);
         }
 
         private void ShowPrice(double price)
         {
-            MessageBox.Show("Price of the bond : " + price + "€");
+            MessageBox.Show("Price of the bond : " + Math.Round(price, 2) + "€");
         }
 
         private void Price(object sender, RoutedEventArgs e)
         {
             SetParameters(sender, e);
-            ShowPrice(bond.GetPrice());
+            ShowPrice(bond.GetPrice(action));
         }
 
         private void QuickSimulation(object sender, RoutedEventArgs e)
@@ -80,27 +85,23 @@ namespace PricerBond
             double faceValue = 100000;
             double annualRate = 5.5/100;
             double marketRate = 1.2/100;
-            ConventionDate maturity = new ConventionDate(2025, 10, 12);
+            ConventionDate maturity = new ConventionDate(2022, 11, 15);
             int frequency = 1;
             bond = new Bond(faceValue, annualRate, marketRate, frequency, maturity);
-            ShowPrice(bond.GetPrice());
+            
+            double price = 0;
+            int nbSimulations = 100;
+            for (var simul = 0; simul < nbSimulations; simul++)
+            {
+                action = new Action("ACCOR", 100, new ConventionDate(), maturity);
+                price += bond.GetPrice(action);
+            }
+            ShowPrice(price / nbSimulations);
         }
 
-        private string GetActionTrajectory()
+        private string FormatString(string toFormat)
         {
-            var engine = Python.CreateEngine();
-            ScriptSource source = engine.CreateScriptSourceFromFile("market.py");
-            return source.Execute();
-        }
-
-        private void BuildAction()
-        {
-            action = new Action();
-            string json = GetActionTrajectory();
-            var ms = new MemoryStream(Encoding.UTF8.GetBytes(json));
-            var ser = new DataContractJsonSerializer(action.GetType());
-            action = ser.ReadObject(ms) as Action;
-            ms.Close();
+            return toFormat.Substring(39);
         }
     }
 }

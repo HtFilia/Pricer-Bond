@@ -18,6 +18,12 @@
         </Grid.RowDefinitions>
 
         <!-- Parameters -->
+        <!-- Fixed or Variable Yield -->
+        <ComboBox Name="YieldType" Margin="34,97,101,21" Grid.Column="1" Grid.Row="1">
+            <ComboBoxItem Content="Fixed Yield" IsSelected="True"/>
+            <ComboBoxItem Content="Variable Yield" />
+        </ComboBox>
+
         <!-- Zero-Coupon Yield -->
         <TextBlock Text="Market Rate" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="34,56,0,0" />
         <TextBox Grid.Column="1" x:Name="MarketRate" Margin="170,51,32,64" />
@@ -43,12 +49,12 @@
 
 
         <!-- Nominal -->
-        <TextBlock Text="Face Value" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="34,46,0,0" Grid.Row="1" />
+        <TextBlock Text="Face Value" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="34,58,0,0" Grid.Row="1" RenderTransformOrigin="0.591,2.302" />
         <TextBox x:Name="FaceValue" Grid.ColumnSpan="2" Grid.Column="1" Margin="170,44,202,72" Grid.Row="1" />
 
         <!-- Maturity -->
-        <Label Content="Maturity" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="94,20,0,0" />
-        <TextBox x:Name="Maturity" Margin="59,51,59,64" />
+        <Label Content="Maturity" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="34,12,0,0" Grid.Column="1" Width="58" />
+        <TextBox x:Name="Maturity" Margin="170,10,215,105" Grid.ColumnSpan="2" Grid.Column="1" />
 
 
         <!-- Market Data Generator -->

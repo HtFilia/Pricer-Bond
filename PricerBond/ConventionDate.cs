@@ -87,12 +87,29 @@ namespace PricerBond
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return (this.Day.GetHashCode() + this.Month.GetHashCode() + this.Year.GetHashCode());
         }
 
         public int NumberDays(ConventionDate endDate)
         {
             return (360 * (endDate.Year - this.Year) + 30 * (endDate.Month - this.Month) + (endDate.Day - this.Day));
+        }
+
+        public ConventionDate GetNextDate()
+        {
+            if (this.Day < 30)
+            {
+                return new ConventionDate(this.Year, this.Month, this.Day + 1);
+            } else
+            {
+                if (this.Month < 12)
+                {
+                    return new ConventionDate(this.Year, this.Month + 1, 1);
+                } else
+                {
+                    return new ConventionDate(this.Year + 1, 1, 1);
+                }
+            }
         }
     }
 }
